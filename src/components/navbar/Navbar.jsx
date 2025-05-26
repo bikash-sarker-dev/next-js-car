@@ -1,7 +1,11 @@
+"use client";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 
 const Navbar = () => {
+  const { data: session, status } = useSession();
+  console.log(session?.user?.image);
   let links = (
     <>
       <li>
@@ -52,19 +56,46 @@ const Navbar = () => {
             </ul>
           </div>
           <Link href={"/"} className="btn btn-ghost text-xl">
-            <Image src={"./assets/logo.svg"} width={80} height={50} />
+            <Image
+              src={"./assets/logo.svg"}
+              width={80}
+              height={50}
+              alt="logo"
+            />
           </Link>
         </div>
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">{links}</ul>
         </div>
         <div className="navbar-end space-x-3">
-          <Link className="btn btn-primary btn-sm" href={"/login"}>
-            LOGIN
-          </Link>
-          <Link className="btn btn-primary btn-sm" href={"/register"}>
-            REGISTER
-          </Link>
+          {status === "authenticated" ? (
+            <>
+              <div>
+                <Image
+                  unoptimized={true}
+                  src={session?.user?.image}
+                  width={60}
+                  height={50}
+                  alt="profile"
+                />
+              </div>
+              <button
+                onClick={() => signOut()}
+                className="btn btn-primary btn-sm"
+              >
+                LOG-OUT
+              </button>
+            </>
+          ) : (
+            <>
+              <Link className="btn btn-primary btn-sm" href={"/login"}>
+                LOGIN
+              </Link>
+              <Link className="btn btn-primary btn-sm" href={"/register"}>
+                REGISTER
+              </Link>
+            </>
+          )}
           <button className="btn btn-outline ">Appointment</button>
         </div>
       </div>

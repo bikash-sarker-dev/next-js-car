@@ -1,9 +1,10 @@
 "use client";
 
+import registerAction from "@/app/actions/authentication/registerAction";
 import Image from "next/image";
 
 const RegisterForm = () => {
-  let handleSubmit = (e) => {
+  let handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
     const name = form.username.value;
@@ -11,6 +12,9 @@ const RegisterForm = () => {
     const password = form.password.value;
     const payload = { name, email, password };
     console.log(payload);
+    let res = await registerAction(payload);
+    console.log(res);
+    form.reset();
   };
   return (
     <div>

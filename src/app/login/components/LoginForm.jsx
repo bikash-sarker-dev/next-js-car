@@ -1,15 +1,39 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import SocialLink from "./SocialLink";
 
 const LoginForm = () => {
-  let handleSubmit = (e) => {
+  const router = useRouter();
+  let handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
     const email = form.email.value;
     const password = form.password.value;
     const payload = { email, password };
-    console.log(payload);
+    toast("submitting............");
+    try {
+      let logins = await signIn("credentials", {
+        email,
+        password,
+        // callbackUrl: "/",
+        redirect: false,
+      });
+      if (logins.ok) {
+        toast.success("you has to successfully");
+        router.push("/");
+        form.reset();
+      } else {
+        toast.error("Authentication Failed");
+      }
+
+      console.log(logins);
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <div>
@@ -48,6 +72,7 @@ const LoginForm = () => {
                 </fieldset>
               </form>
             </div>
+            <SocialLink />
           </div>
         </div>
       </div>
