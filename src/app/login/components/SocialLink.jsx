@@ -1,10 +1,13 @@
 "use client";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import toast from "react-hot-toast";
 
 const SocialLink = () => {
   let router = useRouter();
+  const session = useSession();
+
   const handleSocialLink = async (providerName) => {
     toast("login.........");
     let result = await signIn(providerName, { redirect: false });
@@ -15,6 +18,12 @@ const SocialLink = () => {
       toast.error("Authentication Failed");
     }
   };
+  useEffect(() => {
+    if (session?.status === "authenticated") {
+      router.push("/");
+      toast.success("you have successfully login");
+    }
+  }, [session?.status]);
   return (
     <div className="text-center space-x-4 mb-5">
       <button
