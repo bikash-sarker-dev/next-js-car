@@ -2,6 +2,7 @@ import loginAction from "@/app/actions/authentication/loginAction";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
+import dbConnect, { collectionNames } from "./dbConnect";
 
 export const authOptions = {
   providers: [
@@ -41,6 +42,25 @@ export const authOptions = {
       clientSecret: process.env.GITHUB_SECRET,
     }),
   ],
+  callbacks: {
+    async signIn({ user, account, profile, email, credentials }) {
+      if (account) {
+        let { name, email, image } = user;
+        let { providerAccountId, provider } = account;
+
+        let payload = { name, email, image, providerAccountId, provider };
+
+        const userCollection = dbConnect(collectionNames.USERS);
+        const isUser = await userCollection.findOne({ providerAccountId });
+        if (!isUser) {
+          await userCollection.insertOne(payload);
+        } else {
+          return false;
+        }
+      }
+      return true;
+    },
+  },
   pages: {
     signIn: "/login",
   },
